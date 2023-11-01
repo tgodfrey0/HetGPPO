@@ -36,9 +36,7 @@ from rllib_differentiable_comms.multi_trainer import MultiPPOTrainer
 
 class PathUtils:
     scratch_dir = (
-        Path("/Users/Matteo/scratch/")
-        if platform.system() == "Darwin"
-        else Path("/local/scratch/mb2389/")
+        Path("scratch/")
     )
     gppo_dir = Path(__file__).parent.resolve()
     result_dir = gppo_dir / "results"
@@ -70,10 +68,11 @@ class TrainingUtils:
     @staticmethod
     def init_ray(scenario_name: str, local_mode: bool = False):
         if not ray.is_initialized():
-            ray.init(
+            """ray.init(
                 _temp_dir=str(PathUtils.scratch_dir / "ray"),
                 local_mode=local_mode,
-            )
+            )"""
+            ray.init()
             print("Ray init!")
         register_env(scenario_name, lambda config: TrainingUtils.env_creator(config))
         ModelCatalog.register_custom_model("GPPO", GPPO)

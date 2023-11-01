@@ -6,15 +6,17 @@ import os
 import pickle
 
 from ray import tune
-from ray.air.callbacks.wandb import WandbLoggerCallback
-from ray.rllib.agents.ppo import PPOTrainer
-from ray.rllib.algorithms.callbacks import MultiCallbacks
+from ray.air.integrations.wandb import WandbLoggerCallback
+from ray.rllib.algorithms.ppo import PPO
+from ray.rllib.algorithms.callbacks import make_multi_callbacks
+from ray.rllib.models.tf.tf_modelv2 import TFModelV2
+from ray.tune import Tuner
 
 from rllib_differentiable_comms.multi_trainer import MultiPPOTrainer
 from utils import PathUtils, TrainingUtils
 
 ON_MAC = False
-save = PPOTrainer
+save = PPO
 
 train_batch_size = 60000 if not ON_MAC else 200  # Jan 32768
 num_workers = 1 if not ON_MAC else 0  # jan 4
@@ -28,21 +30,23 @@ scenario_name = "flocking"
 # model_name = "MyFullyConnectedNetwork"
 model_name = "GPPO"
 
-
 def train(
-    share_observations,
-    centralised_critic,
+    seed,
     restore,
+    notes,
+    # Model important
+    share_observations,
     heterogeneous,
-    max_episode_steps,
+    # Other model
+    share_action_value,
+    centralised_critic, 
     use_mlp,
+    add_agent_index,
     aggr,
     topology_type,
-    add_agent_index,
+    # Env
+    max_episode_steps,
     continuous_actions,
-    seed,
-    notes,
-    share_action_value,
 ):
     checkpoint_rel_path = "ray_results/joint/HetGIPPO/MultiPPOTrainer_joint_654d9_00000_0_2022-08-23_17-26-52/checkpoint_001349/checkpoint-1349"
     checkpoint_path = PathUtils.scratch_dir / checkpoint_rel_path
@@ -67,7 +71,8 @@ def train(
             config = pickle.load(f)
 
     trainer = MultiPPOTrainer
-    trainer_name = "MultiPPOTrainer" if trainer is MultiPPOTrainer else "PPOTrainer"
+    trainer_name = "MultiPPOTrainer" if trainer is MultiPPOTrainer else "PPO"
+
     tune.run(
         trainer,
         name=group_name if model_name.startswith("GPPO") else model_name,
@@ -79,7 +84,7 @@ def train(
                 notes=notes,
             )
         ],
-        local_dir=str(PathUtils.scratch_dir / "ray_results" / scenario_name),
+        #local_dir=str(PathUtils.scratch_dir / "ray_results" / scenario_name),
         stop={"training_iteration": 500},
         restore=str(checkpoint_path) if restore else None,
         config={
@@ -156,7 +161,8 @@ def train(
                 "env_config": {
                     "num_envs": 1,
                 },
-                "callbacks": MultiCallbacks(
+                "callbacks": make_multi_callbacks
+        (
                     [
                         TrainingUtils.RenderingCallbacks,
                         TrainingUtils.EvaluationCallbacks,
@@ -164,7 +170,8 @@ def train(
                     ]
                 ),
             },
-            "callbacks": MultiCallbacks(
+            "callbacks": make_multi_callbacks
+    (
                 [
                     TrainingUtils.EvaluationCallbacks,
                 ]

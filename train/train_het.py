@@ -6,8 +6,8 @@ import os
 import pickle
 
 from ray import tune
-from ray.air.callbacks.wandb import WandbLoggerCallback
-from ray.rllib.algorithms.callbacks import MultiCallbacks
+from ray.air.integrations.wandb import WandbLoggerCallback
+from ray.rllib.algorithms.callbacks import make_multi_callbacks
 from ray.rllib.models import MODEL_DEFAULTS
 
 from rllib_differentiable_comms.multi_trainer import MultiPPOTrainer
@@ -144,7 +144,7 @@ def train(
                 "env_config": {
                     "num_envs": 1,
                 },
-                "callbacks": MultiCallbacks(
+                "callbacks": make_multi_callbacks(
                     [
                         TrainingUtils.RenderingCallbacks,
                         TrainingUtils.HeterogeneityMeasureCallbacks,
@@ -152,7 +152,7 @@ def train(
                     ]
                 ),
             },
-            "callbacks": MultiCallbacks(
+            "callbacks": make_multi_callbacks(
                 [
                     TrainingUtils.EvaluationCallbacks,
                 ]
