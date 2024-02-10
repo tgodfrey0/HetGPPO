@@ -69,18 +69,10 @@ class TrainingUtils:
     def init_ray(scenario_name: str, local_mode: bool = False):
         ray.shutdown()
         if not ray.is_initialized():
-<<<<<<< HEAD
-            """ray.init(
-                _temp_dir=str(PathUtils.scratch_dir / "ray"),
-                local_mode=local_mode,
-            )"""
-            ray.init()
-=======
             ray.init(
                 #_temp_dir=str(PathUtils.scratch_dir / "ray"),
                 #local_mode=local_mode,
             )
->>>>>>> 2ec0cd93dd9f1e8870d93e9499646354a572ff54
             print("Ray init!")
         register_env(scenario_name, lambda config: TrainingUtils.env_creator(config))
         ModelCatalog.register_custom_model("GPPO", GPPO)
