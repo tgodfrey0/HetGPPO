@@ -1,9 +1,5 @@
 numpy==1.23.5
-vmas
+vmas==1.2.12
 wandb
 torch
 torch_geometric
-torch_scatter
-torch_sparse
-torch_cluster
-torch_spline_conv
