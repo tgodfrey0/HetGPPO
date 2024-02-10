@@ -67,12 +67,20 @@ class InjectMode(Enum):
 class TrainingUtils:
     @staticmethod
     def init_ray(scenario_name: str, local_mode: bool = False):
+        ray.shutdown()
         if not ray.is_initialized():
+<<<<<<< HEAD
             """ray.init(
                 _temp_dir=str(PathUtils.scratch_dir / "ray"),
                 local_mode=local_mode,
             )"""
             ray.init()
+=======
+            ray.init(
+                #_temp_dir=str(PathUtils.scratch_dir / "ray"),
+                #local_mode=local_mode,
+            )
+>>>>>>> 2ec0cd93dd9f1e8870d93e9499646354a572ff54
             print("Ray init!")
         register_env(scenario_name, lambda config: TrainingUtils.env_creator(config))
         ModelCatalog.register_custom_model("GPPO", GPPO)
@@ -106,6 +114,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ):
+            #print("=============================== EVAL EP STEP") 
             info = episode.last_info_for()
             for a_key in info.keys():
                 for b_key in info[a_key]:
@@ -123,6 +132,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ):
+            #print("=============================== EVAL EP END")
             info = episode.last_info_for()
             for a_key in info.keys():
                 for b_key in info[a_key]:
@@ -143,11 +153,13 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
+            print("=============================== REND EP STEP") # THIS IS WHERE THE ISSUE IS
             self.frames.append(
                 base_env.vector_env.try_render_at(
                     mode="rgb_array", agent_index_focus=None
                 )
             )
+            print("=============================== REND EP STEP'") # THIS IS WHERE THE ISSUE IS
 
         def on_episode_end(
             self,
@@ -158,10 +170,13 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
+            print("=============================== REND EP END")
             vid = np.transpose(self.frames, (0, 3, 1, 2))
+            print("=============================== REND EP END'")
             episode.media["rendering"] = wandb.Video(
                 vid, fps=1 / base_env.vector_env.env.world.dt, format="mp4"
             )
+            print("=============================== REND EP END''")
             self.frames = []
 
     class HeterogeneityMeasureCallbacks(DefaultCallbacks):
@@ -184,6 +199,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
+            print("=============================== MEAS EP STEP")
             obs = episode.last_raw_obs_for()
             act = episode.last_action_for()
             info = episode.last_info_for()
@@ -204,6 +220,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
+            print("=============================== MEAS EP END")
             self.env: Environment = base_env.vector_env.env
             self.n_agents = self.env.n_agents
             self.input_lens = [

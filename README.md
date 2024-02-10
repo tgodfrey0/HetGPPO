@@ -1,3 +1,5 @@
+python 3.10
+
 # HetGPPO & SND
 
 <img src="https://github.com/matteobettini/vmas-media/blob/main/hetgppo/HETGIPPO_fill.png?raw=true" alt="drawing"/>  
