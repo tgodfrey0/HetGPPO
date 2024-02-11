@@ -184,7 +184,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
-            print("=============================== MEAS EP STEP")
+            # print("=============================== MEAS EP STEP")
             obs = episode.last_raw_obs_for()
             act = episode.last_action_for()
             info = episode.last_info_for()
@@ -205,7 +205,7 @@ class TrainingUtils:
             episode: Episode,
             **kwargs,
         ) -> None:
-            print("=============================== MEAS EP END")
+            # print("=============================== MEAS EP END")
             self.env: Environment = base_env.vector_env.env
             self.n_agents = self.env.n_agents
             self.input_lens = [
