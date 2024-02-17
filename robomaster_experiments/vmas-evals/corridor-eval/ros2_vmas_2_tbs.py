@@ -37,9 +37,9 @@ class MinimalPublisher(Node):
         self.model.eval()
         print("Model ready!")
 
-        self.CS1 = ReferenceState()
+        self.CS1 = ReferenceState() # Current State?
         self.CS2 = ReferenceState()
-        self.RS1 = ReferenceState()
+        self.RS1 = ReferenceState() # Reference State? I.e. state to get to?
         self.RS2 = ReferenceState()
         self.lastRS1 = ReferenceState()
         self.lastRS2 = ReferenceState()
@@ -62,6 +62,7 @@ class MinimalPublisher(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         print("ROS2 starting ..")
 
+    # At 20 Hz publish the new positions of the agents
     def timer_callback(self):
         # evaluate model
         x = 1  # index into "pos" and "vel"
@@ -115,6 +116,7 @@ class MinimalPublisher(Node):
         self.lastRS2 = self.RS2
         self.mytime += self.dt
 
+    # Update the locations on publish
     def cscb1(self, msg):
         self.CS1.pn = msg.state_vector[0]  # + self.off_pn
         self.CS1.pe = msg.state_vector[1]  # + self.off_pe
