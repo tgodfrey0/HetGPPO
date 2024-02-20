@@ -16,6 +16,17 @@ from grid import Grid
 STARTING_POS: str = "B0"
 TARGET_POS: str = "B7"
 
+g = Grid(STARTING_POS, Grid.Heading.NORTH, 3, 8)
+
+class Translator():
+    @staticmethod
+    def grid_to_abs():
+        pass
+    
+    @staticmethod
+    def abs_to_grid():
+        pass
+
 class MinimalPublisher(Node):
     # self.pn0 = 3.0;
     # self.pn1 = 1.0;
