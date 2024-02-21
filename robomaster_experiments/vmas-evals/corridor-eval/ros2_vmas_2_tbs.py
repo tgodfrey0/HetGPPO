@@ -6,31 +6,70 @@ import math
 
 # import torch
 import os
+from dataclasses import dataclass
+from typing import Tuple
 
 import rclpy
 from rclpy.node import Node
 
 import evaluate_model as MDEval
+from math import pi
 from grid import Grid
 
 STARTING_POS: str = "B0"
 TARGET_POS: str = "B7"
 
-g = Grid(STARTING_POS, Grid.Heading.NORTH, 3, 8)
+AREA_WIDTH: float = 3.0
+AREA_LENGTH: float = 3.0 
+
+@dataclass
+class State():
+    grid = Grid(STARTING_POS, Grid.Heading.NORTH, 3, 8)
+
+
+class ReferenceStateMock():
+    def __init__(self):
+        self.pn: float
+        self.pe: float
+        self.pd: float
+        self.vn: float
+        self.ve: float
+        self.vd: float
+        self.yaw: float
+        self.an: float
+        self.ae: float
+        self.ad: float
+        
 
 class Translator():
     @staticmethod
-    def grid_to_abs():
-        pass
+    def grid_to_abs() -> ReferenceStateMock:
+        # Assume centre of grid
+        rs = ReferenceStateMock()
+        pos = (State.grid.col, State.grid.row)
     
     @staticmethod
-    def abs_to_grid():
-        pass
+    def abs_to_grid(rs: ReferenceStateMock) -> Tuple[str, int, Grid.Heading]:
+        # length
+        # ^
+        # 0 -> width
+        col = chr(math.floor((rs.pe / AREA_WIDTH) * State.grid.max_width) + ord('A'))
+        row = math.floor((rs.pn / AREA_LENGTH) * State.grid.max_height)
+        
+        heading: Grid.Heading
+        
+        #? 0 -> 2pi?
+        if(rs.yaw < (pi/2) or rs.yaw > (3/2 * pi)):
+            pass
+        
+        
+        return (col, row)
+        
 
 class MinimalPublisher(Node):
     # self.pn0 = 3.0;
     # self.pn1 = 1.0;
-    # self.RS = ReferenceState();
+    # self.RS = ReferenceStateMock();
 
     def __init__(self, style, a_range, v_range, model_name):
         super().__init__("lawnmower_publisher")
@@ -48,12 +87,12 @@ class MinimalPublisher(Node):
         self.model.eval()
         print("Model ready!")
 
-        self.CS1 = ReferenceState() # Current State?
-        self.CS2 = ReferenceState()
-        self.RS1 = ReferenceState() # Reference State? I.e. state to get to?
-        self.RS2 = ReferenceState()
-        self.lastRS1 = ReferenceState()
-        self.lastRS2 = ReferenceState()
+        self.CS1 = ReferenceStateMock() # Current State?
+        self.CS2 = ReferenceStateMock()
+        self.RS1 = ReferenceStateMock() # Reference State? I.e. state to get to?
+        self.RS2 = ReferenceStateMock()
+        self.lastRS1 = ReferenceStateMock()
+        self.lastRS2 = ReferenceStateMock()
 
         self.dt = 1.0 / 20.0
         self.mytime = 0
@@ -61,13 +100,13 @@ class MinimalPublisher(Node):
             CurrentState, "/robomaster_1/current_state", self.cscb1, 1
         )
         self.publisher1 = self.create_publisher(
-            ReferenceState, "/robomaster_1/reference_state", 1
+            ReferenceStateMock, "/robomaster_1/reference_state", 1
         )
         self.subscriber2 = self.create_subscription(
             CurrentState, "/robomaster_2/current_state", self.cscb2, 1
         )
         self.publisher2 = self.create_publisher(
-            ReferenceState, "/robomaster_2/reference_state", 1
+            ReferenceStateMock, "/robomaster_2/reference_state", 1
         )
         timer_period = self.dt  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
