@@ -82,6 +82,8 @@ class MinimalPublisher(Node):
 
         dname = os.path.dirname(os.path.realpath(__file__))
         mdlpath = dname + f"/{self.model_name}"
+        
+        self.get_logger().info(f"Loading model: {mdlpath}")
 
         self.model = torch.load(mdlpath)
         self.model.eval()

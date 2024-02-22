@@ -20,7 +20,7 @@ def export(
 
     model_path = (
         Path(checkpoint_path).parent
-        / "a_range_1_u_range_0_5_[3_2_0_002]_0_05_dt_0_1_friction_0_dt_delay_option_5.pt"
+        / "give_way_export.pt"
     )
 
     model = trainer.get_policy().model.gnn
@@ -29,5 +29,5 @@ def export(
 
 
 if __name__ == "__main__":
-    checkpoint_path = "/Users/Matteo/Downloads/MultiPPOTrainer_give_way_deploy_7ec2a_00000_0_2022-10-18_11-13-22/checkpoint_000267/checkpoint-267"
+    checkpoint_path = "/home/tg/projects/p3p/HetGPPO/scratch/ray_results/give_way/HetGPPO/MultiPPOTrainer_give_way_381aa_00000_0_2024-02-21_17-11-14/checkpoint_000080"
     export(checkpoint_path)
