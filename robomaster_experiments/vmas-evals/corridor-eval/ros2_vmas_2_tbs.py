@@ -86,6 +86,7 @@ class MinimalPublisher(Node):
         self.get_logger().info(f"Loading model: {mdlpath}")
 
         self.model = torch.load(mdlpath)
+        print("Model loaded!")
         self.model.eval()
         print("Model ready!")
 
