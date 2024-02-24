@@ -65,7 +65,7 @@ def get_finished():
   with finished_lock:
     return finished
 
-# def timer_callback(self):
+# def timer_callback(self): #TODO Play around with this to see how it behaves
 #         # evaluate model
 #         x = 1  # index into "pos" and "vel"
 #         y = 0
