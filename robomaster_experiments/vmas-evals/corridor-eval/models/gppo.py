@@ -191,6 +191,10 @@ class MatPosConv(MessagePassing):
         )
 
     def forward(self, x: Tensor, edge_index: Tensor, edge_attr: Tensor) -> Tensor:
+        print("Forward")
+        print(x.shape)
+        print(edge_index.shape)
+        print(edge_attr.shape)
         out = self.propagate(
             edge_index=edge_index,
             x=x,
@@ -199,6 +203,10 @@ class MatPosConv(MessagePassing):
         return out
 
     def message(self, x_i: Tensor, x_j: Tensor, edge_attr: Tensor) -> Tensor:
+        print("Message")
+        print(x_i.shape)
+        print(x_j.shape)
+        print(edge_attr.shape)
         msg = self.message_encoder(torch.cat([x_j, edge_attr], dim=-1))
         return msg
 
