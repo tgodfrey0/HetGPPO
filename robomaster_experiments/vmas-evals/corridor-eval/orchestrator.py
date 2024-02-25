@@ -144,6 +144,9 @@ if __name__=="__main__":
   model.eval()
   print("Model ready!")
   
+  res = MDEval.compute_action_corridor(1, 1, 0, 0, 1, 1, 0, 0, model, 0.5, deterministic=True)
+  print(res)
+  
   # while(not get_finished()):
   #   pass
   

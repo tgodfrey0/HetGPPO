@@ -192,7 +192,7 @@ class MatPosConv(MessagePassing):
 
     def forward(self, x: Tensor, edge_index: Tensor, edge_attr: Tensor) -> Tensor:
         out = self.propagate(
-            edge_index,
+            edge_index=edge_index,
             x=x,
             edge_attr=edge_attr,
         )
