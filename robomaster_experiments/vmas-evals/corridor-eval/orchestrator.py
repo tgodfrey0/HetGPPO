@@ -17,6 +17,7 @@ from grid import Grid
 from typing import List, Tuple, Optional, Dict
 from threading import Lock
 from time import sleep
+import argparse
 
 finished_lock = Lock()
 finished = False
@@ -46,6 +47,7 @@ bob: Agent = Agent("Bob", "B7", Grid.Heading.SOUTH, (0, 5), pi)
 dl: List[Tuple[str, int]] = [()]
 
 sn: SwarmNet
+model = None
 
 def finished_recv(str: Optional[str]):
   global finished
@@ -119,10 +121,30 @@ def get_finished():
 #         self.mytime += self.dt
 
 if __name__=="__main__":
+  parser = argparse.ArgumentParser(description="Runs a vmas model.")
+
+  parser.add_argument("--v_range", type=float)
+  parser.add_argument("--a_range", type=float)
+  parser.add_argument("--model_name", type=str)
+  parser.add_argument("--style", type=int)
+
+  args = parser.parse_args()
+  
   sn = SwarmNet({"FORWARD": None, "BACKWARD": None, "CLOCKWISE": None, "ANTICLOCKWISE": None, "FINISHED": finished_recv}, device_list=dl)
-  sn.start()
+  #! sn.start()
   
-  while(not get_finished()):
-    pass
+  dname = os.path.dirname(os.path.realpath(__file__))
+  # mdlpath = dname + f"/{args.model_name}"
+  mdlpath = dname + "/give_way_export.pt"
   
-  sn.kill()
+  print(f"Loading model: {mdlpath}")
+
+  model = torch.load(mdlpath)
+  print("Model loaded!")
+  model.eval()
+  print("Model ready!")
+  
+  # while(not get_finished()):
+  #   pass
+  
+  # sn.kill()
