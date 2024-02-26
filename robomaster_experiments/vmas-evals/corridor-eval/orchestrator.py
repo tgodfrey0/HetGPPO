@@ -16,11 +16,18 @@ from math import pi
 from grid import Grid
 from typing import List, Tuple, Optional, Dict
 from threading import Lock
-from time import sleep
+import time
 import argparse
 
 finished_lock = Lock()
 finished = False
+
+timestamp_lock = Lock()
+timestamp = None
+
+#* a_range = max accel?
+#* I think yaw is just desired heading
+U_RANGE = 0.5
 
 class Agent():
   def __init__(self, n, starting_loc, starting_heading, starting_pos, starting_angular_heading) -> None:
@@ -37,12 +44,13 @@ class Agent():
     self.an = 0.0
     self.ae = 0.0
     self.ad = 0.0
-    self.grid = Grid(starting_loc, starting_heading, 3, 8)
+    self.grid = Grid(starting_loc, starting_heading, 9, 3, 8)
     self.yaw_count = 0.0
     self.angular_heading = starting_angular_heading
+    self.v = 0.0
     
-alice: Agent = Agent("Alice", "B0", Grid.Heading.NORTH, (0,-5), 0)
-bob: Agent = Agent("Bob", "B7", Grid.Heading.SOUTH, (0, 5), pi)
+alice: Agent = Agent("Alice", "B0", Grid.Heading.NORTH, (-5,0), pi/2)
+bob: Agent = Agent("Bob", "B7", Grid.Heading.SOUTH, (5, 0), 3*pi/2)
 
 dl: List[Tuple[str, int]] = [()]
 
@@ -66,38 +74,91 @@ def finished_recv(str: Optional[str]):
 def get_finished():
   with finished_lock:
     return finished
+  
+def compose_vel(v) -> Tuple[float, float]:
+  vn = v[1]
+  ve = v[0]
+  
+  combined_vel = math.sqrt((vn**2) + (ve**2))
+  angle: float
+  
+  if(vn == 0):
+    angle = math.pi / 2
+  else:
+    angle = math.atan(math.abs(ve) / math.abs(vn))
+  
+  angle = -angle if ve < 0 else angle
+  
+  return (combined_vel, angle)
 
-# def timer_callback(self): #TODO Play around with this to see how it behaves
-#         # evaluate model
-#         x = 1  # index into "pos" and "vel"
-#         y = 0
+def decompose_vel(vt) -> Tuple[float, float]:
+  v = vt[0]
+  theta = vt[1]
+  
+  ve = v*math.sin(abs(theta))
+  vn = v*math.cos(abs(theta)) if abs(theta) != (pi / 2) else 0
+  
+  ve = -ve if theta < 0 else ve #? Change to bearing
+  
+  return (vn, ve)
 
-#         pos1 = [self.CS1.pn, self.CS1.pe]
-#         vel1 = [self.CS1.vn, self.CS1.ve]
-#         pos2 = [self.CS2.pn, self.CS2.pe]
-#         vel2 = [self.CS2.vn, self.CS2.ve]
-
-#         print(pos1)
-#         print(pos2)
-
-#         cmd_vels = MDEval.compute_action_corridor(
-#             pos1[x],
-#             pos1[y],
-#             vel1[x],
-#             vel1[y],
-#             pos2[x],
-#             pos2[y],
-#             vel2[x],
-#             vel2[y],
-#             model=self.model,
-#             u_range=self.v_range,
-#             deterministic=True,
-#         )
-
-#         cmd_vel1 = cmd_vels[0]
-#         cmd_vel2 = cmd_vels[1]
-#         # print( cmd_vels, cmd_vel1, cmd_vel2 );
-
+def send_vels():
+  global timestamp
+  
+  a_v, a_t = decompose_vel((alice.vn, alice.ve))
+  b_v, b_t = decompose_vel((bob.vn, bob.ve))
+  
+  alice.v = a_v
+  alice.angular_heading += a_t
+  bob.v = b_v
+  bob.angular_heading += b_t
+  
+  sn.send(f"VT ALICE {alice.v} {alice.angular_heading}")
+  sn.send(f"VT BOB {bob.v} {bob.angular_heading}")
+  
+  with timestamp_lock:
+    timestamp = time.perf_counter()
+  
+def get_pos(pos_0, pos_1, vel_0, vel_1):
+  x = 1
+  y = 0
+  
+  with timestamp_lock:
+    if timestamp is not None:
+      t_n = time.perf_counter()
+      
+      alice.pn += alice.vn * (t_n - timestamp)
+      alice.pe += alice.ve * (t_n - timestamp)
+      bob.pn += bob.vn * (t_n - timestamp)
+      bob.pe += bob.ve * (t_n - timestamp) #! Move this out of this fn 
+  
+  cmd_vels = MDEval.compute_action_corridor(
+    pos_0[x], 
+    pos_0[y], 
+    vel_0[x], 
+    vel_0[y], 
+    pos_1[x], 
+    pos_1[y], 
+    vel_1[x], 
+    vel_1[y], 
+    model=model, 
+    u_range=U_RANGE, 
+    deterministic=True
+  )
+  
+  print(cmd_vels)
+  
+  cmd_vel_0 = cmd_vels[0]
+  cmd_vel_1 = cmd_vels[1]
+  
+  alice.vn = cmd_vel_0[x]
+  alice.ve = cmd_vel_0[y]
+  
+  bob.vn = cmd_vel_1[x]
+  bob.ve = cmd_vel_1[y]
+  
+  #* Record time since last velocities were sent then calculate the position 
+  
 #         self.RS1.vn = cmd_vel1[x]
 #         self.RS1.ve = cmd_vel1[y]
 #         self.RS1.yaw = math.pi / 2  # math.pi / 4.0; # math.atan2( a[1], a[0] );
@@ -144,7 +205,7 @@ if __name__=="__main__":
   model.eval()
   print("Model ready!")
   
-  res = MDEval.compute_action_corridor(1, 1, 0, 0, 1, 1, 0, 0, model, 0.5, deterministic=True)
+  res = MDEval.compute_action_corridor(1, 2, 3, 4, 5, 6, 7, 8, model, 0.5, deterministic=True)
   print(res)
   
   # while(not get_finished()):
