@@ -87,7 +87,8 @@ def compose_vel(v) -> Tuple[float, float]:
   else:
     angle = math.atan(math.abs(ve) / math.abs(vn))
   
-  angle = -angle if ve < 0 else angle
+  angle = (2*pi)-angle if ve < 0 else angle
+  #! SOmething if the north val is negative
   
   return (combined_vel, angle)
 
@@ -98,7 +99,7 @@ def decompose_vel(vt) -> Tuple[float, float]:
   ve = v*math.sin(abs(theta))
   vn = v*math.cos(abs(theta)) if abs(theta) != (pi / 2) else 0
   
-  ve = -ve if theta < 0 else ve #? Change to bearing
+  ve = -ve if theta > pi else ve
   
   return (vn, ve)
 
@@ -109,12 +110,15 @@ def send_vels():
   b_v, b_t = decompose_vel((bob.vn, bob.ve))
   
   alice.v = a_v
-  alice.angular_heading += a_t
+  a_d_heading = a_t - alice.angular_heading
+  alice.angular_heading = a_t
   bob.v = b_v
-  bob.angular_heading += b_t
+  b_d_heading = b_t - bob.angular_heading
+  bob.angular_heading = b_t
   
-  sn.send(f"VT ALICE {alice.v} {alice.angular_heading}")
-  sn.send(f"VT BOB {bob.v} {bob.angular_heading}")
+  # Send speed and rotation
+  sn.send(f"VT ALICE {alice.v} {a_d_heading}")
+  sn.send(f"VT BOB {bob.v} {b_d_heading}")
   
   with timestamp_lock:
     timestamp = time.perf_counter()
