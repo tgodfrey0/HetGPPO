@@ -283,11 +283,14 @@ def evaluate_completion():
 
 
 def evaluate_resilience():
-    hetgppo_model_path = "/Users/Matteo/PycharmProjects/HetGPPO/results/real-world-models/het_a_range_1_u_range_0_5_[3_2_0_002]_0_05_dt_0_1_friction_0_dt_delay_option_0.pt"
-    gppo_model_path = "/Users/Matteo/PycharmProjects/HetGPPO/results/real-world-models/a_range_1_u_range_0_5_[3_2_0_002]_0_05_dt_0_1_friction_0_dt_delay_option_0.pt"
+    # hetgppo_model_path = "/Users/Matteo/PycharmProjects/HetGPPO/results/real-world-models/het_a_range_1_u_range_0_5_[3_2_0_002]_0_05_dt_0_1_friction_0_dt_delay_option_0.pt"
+    # gppo_model_path = "/Users/Matteo/PycharmProjects/HetGPPO/results/real-world-models/a_range_1_u_range_0_5_[3_2_0_002]_0_05_dt_0_1_friction_0_dt_delay_option_0.pt"
+    hetgppo_model_path = "scratch/ray_results/give_way/HetGPPO/MultiPPOTrainer_give_way_381aa_00000_0_2024-02-21_17-11-14/checkpoint_000080/give_way_export.pt"
+    gppo_model_path = "scratch/ray_results/give_way/HetGPPO/MultiPPOTrainer_give_way_381aa_00000_0_2024-02-21_17-11-14/checkpoint_000080/give_way_export.pt"
 
     env = EvaluationUtils.get_config_trainer_and_env_from_checkpoint(
-        "/Users/Matteo/PycharmProjects/HetGPPO/results/MultiPPOTrainer_give_way_deploy_72a9b_00000_0_2022-10-18_11-13-01/checkpoint_001295/checkpoint-1295"
+        # "/Users/Matteo/PycharmProjects/HetGPPO/results/MultiPPOTrainer_give_way_deploy_72a9b_00000_0_2022-10-18_11-13-01/checkpoint_001295/checkpoint-1295"
+        "/home/tg/projects/p3p/HetGPPO/scratch/ray_results/give_way/HetGPPO/MultiPPOTrainer_give_way_381aa_00000_0_2024-02-21_17-11-14/checkpoint_000080/"
     )[2]
 
     evaluate_increasing_noise(
