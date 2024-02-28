@@ -220,6 +220,6 @@ if __name__ == "__main__":
             aggr="add",
             topology_type="full",
             # Env
-            max_episode_steps=500,
+            max_episode_steps=200, #500,
             continuous_actions=True,
         )
