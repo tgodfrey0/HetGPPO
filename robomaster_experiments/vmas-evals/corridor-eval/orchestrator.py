@@ -44,7 +44,7 @@ class Agent():
     self.an = 0.0
     self.ae = 0.0
     self.ad = 0.0
-    self.grid = Grid(starting_loc, starting_heading, 9, 3, 8)
+    self.grid = Grid(starting_loc, starting_heading, 9, 3)
     self.yaw_count = 0.0
     self.angular_heading = starting_angular_heading
     self.v = 0.0
@@ -195,7 +195,7 @@ if __name__=="__main__":
 
   args = parser.parse_args()
   
-  sn = SwarmNet({"VT": None, "INFO": lambda s: print(f"Info from {s.split(" ", 2)[0]}: {s.split(" ", 2)[1]}")}, device_list=dl)
+  sn = SwarmNet({"VT": None, "INFO": lambda s: print(f"Info from {s.split(' ', 2)[0]}: {s.split(' ', 2)[1]}")}, device_list=dl)
   #! sn.start()
   
   dname = os.path.dirname(os.path.realpath(__file__))
