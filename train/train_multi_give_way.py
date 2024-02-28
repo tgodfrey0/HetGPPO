@@ -15,8 +15,8 @@ from utils import PathUtils, TrainingUtils
 ON_MAC = False
 
 train_batch_size = 60000 if not ON_MAC else 200  # Jan 32768
-num_workers = 10 if not ON_MAC else 0  # jan 4
-num_envs_per_worker = 30 if not ON_MAC else 1  # Jan 32
+num_workers = 5 # 10 if not ON_MAC else 0  # jan 4
+num_envs_per_worker = 24 # 30 if not ON_MAC else 1  # Jan 32
 rollout_fragment_length = (
     train_batch_size
     if ON_MAC

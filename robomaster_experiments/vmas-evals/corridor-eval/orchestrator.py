@@ -208,8 +208,25 @@ if __name__=="__main__":
   print("Model loaded!")
   model.eval()
   print("Model ready!")
+  print(model)
   
-  res = MDEval.compute_action_corridor(1, 2, 3, 4, 5, 6, 7, 8, model, 0.5, deterministic=True)
+  
+  res = MDEval.compute_action_corridor(
+    pos0_x=1.0, 
+    pos0_y=2.0, 
+    vel0_x=3.0, 
+    vel0_y=4.0, 
+    pos1_x=5.0, 
+    pos1_y=6.0, 
+    vel1_x=7.0, 
+    vel1_y=8.0, 
+    model=model, 
+    u_range=0.5, 
+    n_agents=2,
+    obs_size=4,
+    num_actions_per_agent=2,
+    deterministic=True,
+    circular_action_constraint=True)
   print(res)
   
   # while(not get_finished()):
