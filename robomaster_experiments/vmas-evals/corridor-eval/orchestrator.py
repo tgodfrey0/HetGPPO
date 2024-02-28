@@ -123,7 +123,7 @@ def send_vels():
   with timestamp_lock:
     timestamp = time.perf_counter()
   
-def get_pos(pos_0, pos_1, vel_0, vel_1):
+def get_pos():
   x = 1
   y = 0
   
@@ -134,17 +134,17 @@ def get_pos(pos_0, pos_1, vel_0, vel_1):
       alice.pn += alice.vn * (t_n - timestamp)
       alice.pe += alice.ve * (t_n - timestamp)
       bob.pn += bob.vn * (t_n - timestamp)
-      bob.pe += bob.ve * (t_n - timestamp) #! Move this out of this fn 
+      bob.pe += bob.ve * (t_n - timestamp)
   
   cmd_vels = MDEval.compute_action_corridor(
-    pos_0[x], 
-    pos_0[y], 
-    vel_0[x], 
-    vel_0[y], 
-    pos_1[x], 
-    pos_1[y], 
-    vel_1[x], 
-    vel_1[y], 
+    alice.pe, 
+    alice.pn, 
+    alice.ve, 
+    alice.vn, 
+    bob.pe, 
+    bob.pn, 
+    bob.ve, 
+    bob.vn, 
     model=model, 
     u_range=U_RANGE, 
     deterministic=True
@@ -195,7 +195,7 @@ if __name__=="__main__":
 
   args = parser.parse_args()
   
-  sn = SwarmNet({"FORWARD": None, "BACKWARD": None, "CLOCKWISE": None, "ANTICLOCKWISE": None, "FINISHED": finished_recv}, device_list=dl)
+  sn = SwarmNet({"VT": None, "INFO": lambda s: print(f"Info from {s.split(" ", 2)[0]}: {s.split(" ", 2)[1]}")}, device_list=dl)
   #! sn.start()
   
   dname = os.path.dirname(os.path.realpath(__file__))
@@ -213,6 +213,8 @@ if __name__=="__main__":
   print(res)
   
   # while(not get_finished()):
-  #   pass
+  #   get_pos()
+  #   send_vels()
+  # Delay
   
   # sn.kill()
