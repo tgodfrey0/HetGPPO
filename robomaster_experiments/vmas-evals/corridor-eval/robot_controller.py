@@ -20,14 +20,13 @@ from sensor_msgs.msg import LaserScan
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 # Local package imports
-from .grid import Grid
+from grid import Grid
 
 valid_grid_positions: List[str] = ["A3", "B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "C4"]
 dl = [("192.168.0.1", 51000)]
 AGENT_NAME = "Alice"
 
 ANGULAR_SPEED = pi / 6
-
 
 class VelocityPublisher(Node):
   def __init__(self):
@@ -52,10 +51,10 @@ class VelocityPublisher(Node):
     self.sn_ctrl = SwarmNet({"VT": self.vt_recv, "INFO": None}, device_list = dl) #! Publish INFO messages which can then be subscribed to by observers
     self.sn_ctrl.start()
     self.get_logger().info(f"SwarmNet initialised") 
-    set_log_level(self.SN_LOG_LEVEL)
     self.info("SwarmNet initialised successfully")
     
   def vt_recv(self, msg):
+    self.get_logger().info(f"Message received: {msg}")
     p = msg.split(" ")
     
     if(p[0] != AGENT_NAME):
@@ -73,7 +72,7 @@ class VelocityPublisher(Node):
     
   def info(self, s: str) -> None:
     self.get_logger().info(s)
-    self.sn_ctrl.send(f"INFO {self.AGENT_NAME}: {s}")
+    self.sn_ctrl.send(f"INFO {AGENT_NAME}: {s}")
     
   # def listener_callback(self, msg: LaserScan) -> None:
   #   self.info(f"{msg}") 
@@ -156,17 +155,31 @@ class VelocityPublisher(Node):
     self._publish_zero()
     
   def pub_forwards(self, v):
-    self.info(f"Forwards command")
+    self.info(f"Forwards command: {v} m/s")
     self._pub_linear(1, v)
     
   def pub_backwards(self, v):
-    self.info(f"Backwards command")
+    self.info(f"Backwards command: {v} m/s")
     self._pub_linear(-1, v)
     
   def pub_anticlockwise(self, theta):
-    self.info(f"Anticlockwise command")
+    self.info(f"Anticlockwise command: {theta} rad")
     self._pub_rotation(1, theta)
     
   def pub_clockwise(self, theta):
-    self.info(f"Clockwise command")
+    self.info(f"Clockwise command: {theta} rad")
     self._pub_rotation(-1, theta)
+
+def main(args=None):
+  rclpy.init()
+  
+  vp = VelocityPublisher()
+  
+  while(True):
+    pass
+  
+  vp.destroy_node()
+  rclpy.shutdown()
+
+if __name__=="__main__":
+  main()
