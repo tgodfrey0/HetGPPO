@@ -20,7 +20,7 @@ def export(
 
     model_path = (
         Path(checkpoint_path).parent
-        / "multi_give_way_export.pt"
+        / "give_way_export.pt"
     )
 
     model = trainer.get_policy().model.gnn
@@ -29,5 +29,5 @@ def export(
 
 
 if __name__ == "__main__":
-    checkpoint_path = "/home/tg/projects/p3p/HetGPPO/scratch/ray_results/multi_give_way/HetGPPO/MultiPPOTrainer_multi_give_way_d3cfa_00000_0_2024-02-28_16-24-21/checkpoint_000040"
+    checkpoint_path = "/home/tg/projects/p3p/HetGPPO/scratch/ray_results/give_way/HetGPPO/MultiPPOTrainer_give_way_4b993_00000_0_2024-02-28_21-28-20/checkpoint_000407"
     export(checkpoint_path)

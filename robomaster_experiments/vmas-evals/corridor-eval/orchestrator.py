@@ -199,7 +199,7 @@ if __name__=="__main__":
   #! sn.start()
   
   dname = os.path.dirname(os.path.realpath(__file__))
-  # mdlpath = dname + "/give_way_export.pt"
+  mdlpath = dname + "/give_way_export_v2.pt"
   # mdlpath = dname + "/multi_give_way_export.pt"
   
   print(f"Loading model: {mdlpath}")
